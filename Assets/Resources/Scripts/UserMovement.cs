@@ -3,9 +3,10 @@ using UnityEngine;
 
 public class UserMovement : MonoBehaviour
 {
-    private bool isMoving;
-    public float speed = 1.0f;
-    private Vector3 targetPosition;
+    public float Speed = 1.0f;
+    private Vector3 _targetPosition;
+    private bool _isMoving;
+    private Vector3 _lastRoom = Vector3.positiveInfinity;
 
     private void Start()
     {
@@ -14,36 +15,69 @@ public class UserMovement : MonoBehaviour
 
     private void Update()
     {
-        if (isMoving) MoveToTarget();
+        if (_isMoving)
+        {
+            MoveToTarget();
+        }
     }
 
     private IEnumerator DailyRoutine()
     {
-        while (true) // Loop to start the routine again after a day
+        while (true)
         {
-            // Example routine, adjust times and activities
-            yield return StartCoroutine(GoToRoom(new Vector3(-10, 0, -10), 7)); // Kitchen for breakfast
-            yield return StartCoroutine(GoToRoom(new Vector3(-10, 0, 0), 8)); // WorkRoom
-            yield return StartCoroutine(GoToRoom(new Vector3(-10, 0, -10), 1)); // Kitchen for lunch
-            yield return StartCoroutine(GoToRoom(new Vector3(0, 0, 0), 2)); // LivingRoom
-            yield return StartCoroutine(GoToRoom(new Vector3(-10, 0, 0), 4)); // Back to WorkRoom
-            yield return StartCoroutine(GoToRoom(new Vector3(0, 0, -10), 8)); // BedRoom for sleep
+            if (TimeManager.Instance != null)
+            {
+                var currentTime = TimeManager.Instance.SimulatedTime;
+                var currentHour = Mathf.FloorToInt(currentTime / 60) % 24;
+                var dayOfWeek = Mathf.FloorToInt(currentTime / 1440) % 7; // 0 = Monday, 6 = Sunday
+
+                Vector3 newRoom = DetermineCurrentRoom(currentHour, dayOfWeek);
+
+                if (_lastRoom != newRoom) // Move only if the new room is different from the last
+                {
+                    _lastRoom = newRoom;
+                    yield return StartCoroutine(MoveToRoom(newRoom));
+                }
+            }
+
+            yield return null; // Wait for the next frame
         }
     }
 
-    private IEnumerator GoToRoom(Vector3 roomPosition, int hoursSpent)
+    private Vector3 DetermineCurrentRoom(int currentHour, int dayOfWeek)
     {
-        targetPosition = roomPosition;
-        isMoving = true;
+        // Weekday Schedule
+        if (dayOfWeek < 5)
+        {
+            if (currentHour >= 6 && currentHour < 9) return new Vector3(-10, 0, -10); // Kitchen
+            else if (currentHour >= 9 && currentHour < 18) return new Vector3(-10, 0, 0); // WorkRoom
+            else if (currentHour >= 18) return new Vector3(0, 0, 0); // LivingRoom
+        }
+        else // Weekend Schedule
+        {
+            if (currentHour >= 8) return new Vector3(0, 0, 0); // LivingRoom
+        }
 
-        while (Vector3.Distance(transform.position, targetPosition) > 0.1f) yield return null;
+        return new Vector3(0, 0, -10); // Default to BedRoom
+    }
 
-        isMoving = false;
-        yield return new WaitForSeconds(hoursSpent * 60); // Simulate time spent in the room
+    private IEnumerator MoveToRoom(Vector3 roomPosition)
+    {
+        _targetPosition = roomPosition;
+        _isMoving = true;
+
+        while (Vector3.Distance(transform.position, _targetPosition) > 0.1f)
+        {
+            yield return null; // Wait for the next frame
+        }
+
+        _isMoving = false;
+        // Wait for a bit before the next action
+        yield return new WaitForSeconds(0.01f);
     }
 
     private void MoveToTarget()
     {
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, _targetPosition, Speed * Time.deltaTime);
     }
 }
