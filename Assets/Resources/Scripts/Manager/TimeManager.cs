@@ -3,8 +3,9 @@ using UnityEngine;
 public class TimeManager : MonoBehaviour
 {
     public float TimeScale = 6.0f; // 1 real second = 5 simulated minutes
-    public static TimeManager Instance { get; private set; }
+    public static TimeManager Instance { get; set; }
     public float SimulatedTime { get; set; }
+    public int DaysPassed { get; set; }
 
     private void Awake()
     {
@@ -21,6 +22,17 @@ public class TimeManager : MonoBehaviour
 
     private void FixedUpdate()
     {
-        SimulatedTime += Time.fixedDeltaTime * TimeScale; //Called 50 times per second can be edited in Edit > Project Settings > Time
+        SimulatedTime += Time.deltaTime * TimeScale;
+       // Debug.Log(SimulatedTime);
+        CheckDayChange();
+    }
+
+    private void CheckDayChange()
+    {
+        if (SimulatedTime >= 1440) // New day
+        {
+            SimulatedTime -= 1440;
+            DaysPassed++;
+        }
     }
 }

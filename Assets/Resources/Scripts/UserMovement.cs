@@ -28,7 +28,9 @@ public class UserMovement : MonoBehaviour
             {
                 var currentTime = TimeManager.Instance.SimulatedTime;
                 var currentHour = Mathf.FloorToInt(currentTime / 60) % 24;
-                var dayOfWeek = Mathf.FloorToInt(currentTime / 1440) % 7; // 0 = Monday, 6 = Sunday
+
+                // Use DaysPassed to determine the day of the week
+                var dayOfWeek = TimeManager.Instance.DaysPassed % 7; // 0 = Monday, 6 = Sunday
 
                 var newRoom = DetermineCurrentRoom(currentHour, dayOfWeek);
 

@@ -4,14 +4,12 @@ public class Room : MonoBehaviour
 {
     private const float BaseTemperature = 15f;
     private const float MaxTemperature = 30f;
-    private const float HeatingRate = 0.1f; // Temperature increase per simulated second
-    private const float CoolingRate = 0.05f; // Temperature decrease per simulated second
+    private const float HeatingRate = 0.005f; // Temperature increase per simulated second //TODO not correclty scaled with increased time
+    private const float CoolingRate = 0.001f; // Temperature decrease per simulated second //TODO not correclty scaled with increased time
 
-
-    private float _lastUpdateTime;
-    public float Temperature { get; private set; }
-    public bool IsHeaterOn { get; private set; }
-    public float EnergyConsumption { get; private set; }
+    public float Temperature { get; set; }
+    public bool IsHeaterOn { get; set; }
+    public float EnergyConsumption { get; set; } //TODO not correclty scaled with increased time
 
     private void Start()
     {
@@ -22,8 +20,8 @@ public class Room : MonoBehaviour
     {
         if (TimeManager.Instance != null)
         {
-            var timeDelta = TimeManager.Instance.SimulatedTime - _lastUpdateTime;
-            _lastUpdateTime = TimeManager.Instance.SimulatedTime;
+            // Use Time.deltaTime multiplied by TimeScale for a smoother timeDelta
+            float timeDelta = Time.deltaTime * TimeManager.Instance.TimeScale;
 
             // Update Temperature
             if (IsHeaterOn && Temperature < MaxTemperature)
@@ -39,13 +37,14 @@ public class Room : MonoBehaviour
 
     private float CalculateEnergyUsage(float temperature, float timeDelta)
     {
-        // Energy usage is higher when the temperature is lower.
+        // Energy usage calculation remains the same
         float energyRate = temperature < 25f ? (25f - temperature) * 0.01f : 0.01f;
         return energyRate * timeDelta;
     }
 
-    public void ToggleHeater()
+    public void SetHeater(bool status)
     {
-        IsHeaterOn = !IsHeaterOn;
+        Debug.Log("Heating change");
+        IsHeaterOn = status;
     }
 }

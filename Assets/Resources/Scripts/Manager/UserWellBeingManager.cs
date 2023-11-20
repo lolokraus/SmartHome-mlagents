@@ -1,21 +1,18 @@
+using System;
 using UnityEngine;
 
 public class UserWellBeingManager : MonoBehaviour
 {
     public UserMovement User;
-    public float WellBeing { get; private set; } = 5; // Initialize at a neutral value
+    public float WellBeing { get; set; } = 5; // Initialize at a neutral value //TODO not correclty scaled with increased time
     private const float OptimalTemperature = 23f;
-    private const float WellBeingChangeRate = 0.001f; // Rate of change per simulated second
-
-    private float lastUpdateTime = 0f;
+    private const float WellBeingChangeRate = 0.005f; // Rate of change per simulated second
 
     private void Update()
     {
         if (TimeManager.Instance != null)
         {
-            float timeDelta = TimeManager.Instance.SimulatedTime - lastUpdateTime;
-            lastUpdateTime = TimeManager.Instance.SimulatedTime;
-
+            float timeDelta = Time.deltaTime * TimeManager.Instance.TimeScale;
             Room currentRoom = User.GetCurrentRoom();
             if (currentRoom != null)
             {
@@ -27,8 +24,7 @@ public class UserWellBeingManager : MonoBehaviour
     private void UpdateWellBeingBasedOnRoom(Room room, float timeDelta)
     {
         float temperatureDifference = Mathf.Abs(room.Temperature - OptimalTemperature);
-
-        if (room.Temperature != OptimalTemperature) // If not at optimal temperature
+        if (Math.Abs(room.Temperature - OptimalTemperature) > 0.5f) // If not at optimal temperature
         {
             float wellBeingChange = WellBeingChangeRate * temperatureDifference * timeDelta;
             WellBeing = Mathf.Max(0, WellBeing - wellBeingChange); // Decrease well-being
