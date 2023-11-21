@@ -4,7 +4,7 @@ using UnityEngine;
 public class UserWellBeingManager : MonoBehaviour
 {
     public UserMovement User;
-    public float WellBeing { get; set; } = 5; // Initialize at a neutral value //TODO not correclty scaled with increased time
+    public float WellBeing { get; set; } = 5; // Initialize at a neutral value //TODO I think it scales correctly but if Time Scale is too high I am not sure
     private const float OptimalTemperature = 23f;
     private const float WellBeingChangeRate = 0.005f; // Rate of change per simulated second
 

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class TimeManager : MonoBehaviour
 {
-    public float TimeScale = 6.0f; // 1 real second = 5 simulated minutes
+    public float TimeScale = 6.0f; // 1 real second = 5 simulated minutes  //Values higher than 50 don't work well
     public static TimeManager Instance { get; set; }
     public float SimulatedTime { get; set; }
     public int DaysPassed { get; set; }

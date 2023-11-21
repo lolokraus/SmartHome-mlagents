@@ -45,7 +45,7 @@ public class UserMovement : MonoBehaviour
         }
     }
 
-    private Vector3 DetermineCurrentRoom(int currentHour, int dayOfWeek)
+    private Vector3 DetermineCurrentRoom(int currentHour, int dayOfWeek) //TODO randomise schedule, create more rooms, make a more realistic schedule, stop using coordinates, switch everywhere to tags
     {
         // Weekday Schedule
         if (dayOfWeek < 5)
@@ -76,11 +76,11 @@ public class UserMovement : MonoBehaviour
         _isMoving = true;
 
         while (Vector3.Distance(transform.position, _targetPosition) >
-               0.1f) yield return null; // Wait for the next frame
+               0.01f) yield return null; // Wait for the next frame //TODO not sure if needed, implemented at start for safety
 
         _isMoving = false;
 
-        yield return new WaitForSeconds(0.01f);
+        yield return new WaitForSeconds(0.001f); //TODO not sure if needed, implemented at start for safety
     }
 
     private void MoveToTarget()

@@ -1,15 +1,16 @@
+using System;
 using UnityEngine;
 
 public class Room : MonoBehaviour
 {
     private const float BaseTemperature = 15f;
     private const float MaxTemperature = 30f;
-    private const float HeatingRate = 0.005f; // Temperature increase per simulated second //TODO not correclty scaled with increased time
-    private const float CoolingRate = 0.001f; // Temperature decrease per simulated second //TODO not correclty scaled with increased time
+    private const float HeatingRate = 0.038f; // Temperature increase per simulated second //TODO I think it scales correctly (those two values are good but not perfect can be changes and played with)
+    private const float CoolingRate = 0.025f; // Temperature decrease per simulated second //TODO I think it scales correctly
 
     public float Temperature { get; set; }
     public bool IsHeaterOn { get; set; }
-    public float EnergyConsumption { get; set; } //TODO not correclty scaled with increased time
+    public float EnergyConsumption { get; set; } //TODO I think it scales correctly
 
     private void Start()
     {
@@ -35,16 +36,20 @@ public class Room : MonoBehaviour
         }
     }
 
-    private float CalculateEnergyUsage(float temperature, float timeDelta)
+    private float CalculateEnergyUsage(float temperature, float timeDelta) //TODO needs more realistic calculation
     {
-        // Energy usage calculation remains the same
-        float energyRate = temperature < 25f ? (25f - temperature) * 0.01f : 0.01f;
+        float energyRate;
+        if (temperature > 24f)
+            energyRate = (temperature - 24f) * 0.02f + 0.01f; // Higher rate above 24
+        else if (temperature < 21f)
+            energyRate = (21f - temperature) * 0.02f + 0.01f; // Higher rate below 21
+        else
+            energyRate = 0.01f; // Standard rate between 21 and 24
         return energyRate * timeDelta;
     }
 
     public void SetHeater(bool status)
     {
-        Debug.Log("Heating change");
         IsHeaterOn = status;
     }
 }

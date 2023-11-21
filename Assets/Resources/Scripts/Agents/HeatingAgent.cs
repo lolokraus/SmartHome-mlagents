@@ -1,3 +1,4 @@
+using System;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
@@ -36,20 +37,8 @@ public class HeatingAgent : Agent
 
     public override void OnActionReceived(ActionBuffers actions)
     {
+        //TODO factor in energy consumption
         // Actions, size = number of rooms
-        /*for (var i = 0; i < RoomManager.Rooms.Length; i++)
-        {
-            var heaterStatus = actions.DiscreteActions[i] == 1;
-            RoomManager.Rooms[i].SetHeater(heaterStatus);
-        }
-
-        var totalEnergy = RoomManager.TotalEnergyConsumption;
-        var wellBeing = UserWellBeingManager.WellBeing;
-
-        var normalizedEnergy = Mathf.Log10(Mathf.Max(1, totalEnergy)); 
-
-        AddReward(wellBeing / 10 - normalizedEnergy / 10);*/
-
         for (var i = 0; i < RoomManager.Rooms.Length; i++)
         {
             var heaterStatus = actions.DiscreteActions[i] == 1;
@@ -59,8 +48,17 @@ public class HeatingAgent : Agent
         // Calculate reward based solely on well-being
         var wellBeing = UserWellBeingManager.WellBeing;
 
-        // Reward is proportional to well-being
-        AddReward(wellBeing / 10);
+        // Check if well-being is at the optimal level (10)
+        if (Math.Abs(wellBeing - 10) < 0.5)
+        {
+            // Provide a high reward for achieving optimal well-being
+            AddReward(1.0f);
+        }
+        else
+        {
+            // The penalty is proportional to the deviation from the optimal level
+            AddReward(-(10 - wellBeing) / 10.0f); // Penalize based on how far from 10 the well-being is
+        }
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
