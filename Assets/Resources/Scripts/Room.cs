@@ -14,7 +14,7 @@ public class Room : MonoBehaviour
 
     private void Start()
     {
-        Temperature = BaseTemperature;
+        Temperature = 23f;
     }
 
     private void FixedUpdate()

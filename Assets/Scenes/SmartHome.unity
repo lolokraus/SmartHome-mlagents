@@ -887,7 +887,7 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 420000
+  MaxStep: 10000
   RoomManager: {fileID: 1530906672}
   UserWellBeingManager: {fileID: 944879233}
 --- !u!114 &617214674
@@ -1546,7 +1546,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67afa7f6672b3e14e80d648f32c96a38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TimeScale: 1
+  TimeScale: 30
 --- !u!1 &1247468794
 GameObject:
   m_ObjectHideFlags: 0
