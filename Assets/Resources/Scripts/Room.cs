@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+
 public class Room : MonoBehaviour
 {
     private const float BaseTemperature = 15f;
