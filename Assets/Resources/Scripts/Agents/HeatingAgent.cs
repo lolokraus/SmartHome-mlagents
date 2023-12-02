@@ -11,6 +11,13 @@ public class HeatingAgent : Agent
     private float lastWellBeing = 5f;
     private float lastAverageTemperature = 23f;
 
+
+    private int stepsSinceLastDecision = 0;
+    private const int decisionInterval = 50;
+
+    private int stepsSinceLastRewardCheck = 0;
+    private const int checkRewardInterval = 5;
+
     public override void OnEpisodeBegin()
     {
         // Reset the environment at the beginning of each training episode
@@ -28,6 +35,24 @@ public class HeatingAgent : Agent
         lastAverageTemperature = 23f;
     }
 
+    private void FixedUpdate()
+    {
+        stepsSinceLastDecision++; //Decisions
+        if (stepsSinceLastDecision >= decisionInterval)
+        {
+            RequestDecision();
+            Debug.Log("Requested Decision");
+            stepsSinceLastDecision = 0;
+        }
+
+        stepsSinceLastRewardCheck++; //Reward
+        if (stepsSinceLastRewardCheck >= checkRewardInterval)
+        {
+            UpdateRewards();
+            stepsSinceLastRewardCheck = 0;
+        }
+    }
+
     public override void CollectObservations(VectorSensor sensor)
     {
         // Collect observations
@@ -42,61 +67,54 @@ public class HeatingAgent : Agent
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-        //TODO factor in energy consumption
+
         // Actions, size = number of rooms
         for (var i = 0; i < RoomManager.Rooms.Length; i++)
         {
             var heaterStatus = actions.DiscreteActions[i] == 1;
             RoomManager.Rooms[i].SetHeater(heaterStatus);
         }
-
-        var currentWellBeing = UserWellBeingManager.WellBeing;
-        var wellBeingChange = currentWellBeing - lastWellBeing;
-
-        // Reward for increasing well-being
-        if (wellBeingChange > 0)
-        {
-            AddReward(wellBeingChange / 10.0f);
-        }
-
-        // Big reward for high well-being
-        if (currentWellBeing >= 9f)
-        {
-            AddReward(0.1f); // Constant reward for being in this high well-being range
-        }
-
-        // Penalize stagnating well-being
-        if (wellBeingChange == 0 && currentWellBeing < 5f)
-        {
-            AddReward(-0.05f); // Penalize for not improving well-being when it's low
-        }
-
-        // Penalize stagnating temperature when well-being is low and stagnating
-        bool isTemperatureStagnant = CheckTemperatureStagnation(); // Implement this method based on temperature changes
-        if (isTemperatureStagnant && wellBeingChange == 0 && currentWellBeing < 5f)
-        {
-            AddReward(-0.1f); // Penalize for stagnant temperature in unfavorable conditions
-        }
-
-        lastWellBeing = currentWellBeing; // Update last well-being for next step
     }
 
-    private bool CheckTemperatureStagnation()
+    private void UpdateRewards()
     {
+        var currentWellBeing = UserWellBeingManager.WellBeing;
+
+        var wellBeingChange = currentWellBeing - lastWellBeing;
+
         float currentAverageTemperature = 0f;
         foreach (var room in RoomManager.Rooms)
         {
             currentAverageTemperature += room.Temperature;
         }
         currentAverageTemperature /= RoomManager.Rooms.Length;
+        bool isTemperatureStagnant = Mathf.Abs(currentAverageTemperature - lastAverageTemperature) < 1f;
 
-        // Check if the change in average temperature is below a certain threshold
-        bool isStagnant = Mathf.Abs(currentAverageTemperature - lastAverageTemperature) < 1f; // Threshold can be adjusted
 
-        // Update last average temperature
+       /* Debug.Log("currentWellBeing " + currentWellBeing + " ----- " 
+                  + "lastWellBeing " + lastWellBeing + " ----- " 
+                  + "currentAverageTemperature " + currentAverageTemperature + " ----- "
+                  + "lastAverageTemperature " + lastAverageTemperature);*/
+
+        float reward = CalculateNormalizedReward(currentWellBeing, wellBeingChange, isTemperatureStagnant);
+        AddReward(reward);
+
+        lastWellBeing = currentWellBeing;
         lastAverageTemperature = currentAverageTemperature;
+    }
 
-        return isStagnant;
+    private float CalculateNormalizedReward(float currentWellBeing, float wellBeingChange, bool isTemperatureStagnant)
+    {
+        float reward = 0f;
+
+        if (currentWellBeing >= 9f) reward += 0.5f;
+        if (wellBeingChange > 0) reward += 0.25f;
+        if (wellBeingChange < 0) reward -= 0.25f;
+        //if (isTemperatureStagnant && currentWellBeing < 5f) reward -= 0.25f;
+
+        //return Mathf.Clamp(reward, 0f, 1f);
+
+        return reward;
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
