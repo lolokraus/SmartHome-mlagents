@@ -1,0 +1,47 @@
+{
+    "HeatingAgent": {
+        "checkpoints": [
+            {
+                "steps": 499992,
+                "file_path": "results\\HeatingRun43\\HeatingAgent\\HeatingAgent-499992.onnx",
+                "reward": -4.472411648980502,
+                "creation_time": 1701746997.3540566,
+                "auxillary_file_paths": [
+                    "results\\HeatingRun43\\HeatingAgent\\HeatingAgent-499992.pt"
+                ]
+            },
+            {
+                "steps": 999992,
+                "file_path": "results\\HeatingRun43\\HeatingAgent\\HeatingAgent-999992.onnx",
+                "reward": -4.264864650002475,
+                "creation_time": 1701757109.7250686,
+                "auxillary_file_paths": [
+                    "results\\HeatingRun43\\HeatingAgent\\HeatingAgent-999992.pt"
+                ]
+            },
+            {
+                "steps": 1443328,
+                "file_path": "results\\HeatingRun43\\HeatingAgent\\HeatingAgent-1443328.onnx",
+                "reward": -4.082019420063242,
+                "creation_time": 1701766126.873914,
+                "auxillary_file_paths": [
+                    "results\\HeatingRun43\\HeatingAgent\\HeatingAgent-1443328.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 1443328,
+            "file_path": "results\\HeatingRun43\\HeatingAgent.onnx",
+            "reward": -4.082019420063242,
+            "creation_time": 1701766126.873914,
+            "auxillary_file_paths": [
+                "results\\HeatingRun43\\HeatingAgent\\HeatingAgent-1443328.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0.dev0",
+        "torch_version": "1.13.1+cu117"
+    }
+}

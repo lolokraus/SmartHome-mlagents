@@ -3,14 +3,14 @@ using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class HeatingAgent : Agent
 {
     public RoomManager RoomManager;
     public UserWellBeingManager UserWellBeingManager;
+    public UserMovement UserMovement;
     private float lastWellBeing = 5f;
-    private float lastAverageTemperature = 23f;
-
 
     private int stepsSinceLastDecision = 0;
     private const int decisionInterval = 50;
@@ -20,32 +20,28 @@ public class HeatingAgent : Agent
 
     public override void OnEpisodeBegin()
     {
-        // Reset the environment at the beginning of each training episode
         Debug.Log("Start Simulation");
         foreach (var room in RoomManager.Rooms)
         {
-            room.Temperature = 23f;
+            room.Temperature = Random.Range(15f, 30f);
             room.SetHeater(false);
             room.EnergyConsumption = 0f;
-            
         }
 
         UserWellBeingManager.WellBeing = 5f;
-        lastWellBeing = 5f;
-        lastAverageTemperature = 23f;
+        lastWellBeing = UserWellBeingManager.WellBeing;
     }
 
     private void FixedUpdate()
     {
-        stepsSinceLastDecision++; //Decisions
+        stepsSinceLastDecision++;
         if (stepsSinceLastDecision >= decisionInterval)
         {
             RequestDecision();
-            Debug.Log("Requested Decision");
             stepsSinceLastDecision = 0;
         }
 
-        stepsSinceLastRewardCheck++; //Reward
+        stepsSinceLastRewardCheck++;
         if (stepsSinceLastRewardCheck >= checkRewardInterval)
         {
             UpdateRewards();
@@ -55,20 +51,17 @@ public class HeatingAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        // Collect observations
         foreach (var room in RoomManager.Rooms)
         {
             sensor.AddObservation(room.Temperature);
             sensor.AddObservation(room.IsHeaterOn ? 1 : 0);
         }
 
-        sensor.AddObservation(UserWellBeingManager.WellBeing);
+        sensor.AddObservation(UserWellBeingManager.WellBeing / 10f);
     }
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-
-        // Actions, size = number of rooms
         for (var i = 0; i < RoomManager.Rooms.Length; i++)
         {
             var heaterStatus = actions.DiscreteActions[i] == 1;
@@ -78,50 +71,41 @@ public class HeatingAgent : Agent
 
     private void UpdateRewards()
     {
-        var currentWellBeing = UserWellBeingManager.WellBeing;
-
-        var wellBeingChange = currentWellBeing - lastWellBeing;
-
-        float currentAverageTemperature = 0f;
-        foreach (var room in RoomManager.Rooms)
+        for (int i = 0; i < RoomManager.Rooms.Length; i++)
         {
-            currentAverageTemperature += room.Temperature;
+            var room = RoomManager.Rooms[i];
+            float roomReward = CalculateRoomReward(room);
+            AddReward(roomReward);
         }
-        currentAverageTemperature /= RoomManager.Rooms.Length;
-        bool isTemperatureStagnant = Mathf.Abs(currentAverageTemperature - lastAverageTemperature) < 1f;
 
-
-       /* Debug.Log("currentWellBeing " + currentWellBeing + " ----- " 
-                  + "lastWellBeing " + lastWellBeing + " ----- " 
-                  + "currentAverageTemperature " + currentAverageTemperature + " ----- "
-                  + "lastAverageTemperature " + lastAverageTemperature);*/
-
-        float reward = CalculateNormalizedReward(currentWellBeing, wellBeingChange, isTemperatureStagnant);
-        AddReward(reward);
-
-        lastWellBeing = currentWellBeing;
-        lastAverageTemperature = currentAverageTemperature;
+        lastWellBeing = UserWellBeingManager.WellBeing;
     }
 
-    private float CalculateNormalizedReward(float currentWellBeing, float wellBeingChange, bool isTemperatureStagnant)
+    private float CalculateRoomReward(Room room)
     {
         float reward = 0f;
+        float wellBeingChange = UserWellBeingManager.WellBeing - lastWellBeing;
 
-        if (currentWellBeing >= 9f) reward += 0.5f;
-        if (wellBeingChange > 0) reward += 0.25f;
-        if (wellBeingChange < 0) reward -= 0.25f;
-        //if (isTemperatureStagnant && currentWellBeing < 5f) reward -= 0.25f;
+        if (UserMovement.GetCurrentRoom() == room && UserWellBeingManager.WellBeing >= 9)
+        {
+            reward += 0.1f;
+        }
 
-        //return Mathf.Clamp(reward, 0f, 1f);
+        if (UserMovement.GetCurrentRoom() == room && Math.Abs(wellBeingChange) > 0 && UserWellBeingManager.WellBeing < 9)
+        {
+            reward += wellBeingChange;
+        }
 
         return reward;
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
-        // Heuristic method for testing the agent manually
+        // Manual testing method for the agent
         var discreteActionsOut = actionsOut.DiscreteActions;
         for (var i = 0; i < RoomManager.Rooms.Length; i++)
-            discreteActionsOut[i] = Input.GetKey(KeyCode.H) ? 1 : 0; // Press 'H' to toggle heaters
+        {
+            discreteActionsOut[i] = Input.GetKey(KeyCode.H) ? 1 : 0;
+        }
     }
 }
