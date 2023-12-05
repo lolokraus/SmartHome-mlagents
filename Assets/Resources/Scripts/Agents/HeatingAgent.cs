@@ -10,6 +10,7 @@ public class HeatingAgent : Agent
     public RoomManager RoomManager;
     public UserWellBeingManager UserWellBeingManager;
     public UserMovement UserMovement;
+
     private float lastWellBeing = 5f;
 
     private int stepsSinceLastDecision = 0;
@@ -17,6 +18,9 @@ public class HeatingAgent : Agent
 
     private int stepsSinceLastRewardCheck = 0;
     private const int checkRewardInterval = 5;
+
+    private const float TemperatureRangeThreshold = 2.0f;
+    private float[] temperatureMovingAverage;
 
     public override void OnEpisodeBegin()
     {
@@ -30,6 +34,12 @@ public class HeatingAgent : Agent
 
         UserWellBeingManager.WellBeing = 5f;
         lastWellBeing = UserWellBeingManager.WellBeing;
+
+        temperatureMovingAverage = new float[RoomManager.Rooms.Length];
+        for (int i = 0; i < RoomManager.Rooms.Length; i++)
+        {
+            temperatureMovingAverage[i] = RoomManager.Rooms[i].Temperature;
+        }
     }
 
     private void FixedUpdate()
@@ -46,6 +56,11 @@ public class HeatingAgent : Agent
         {
             UpdateRewards();
             stepsSinceLastRewardCheck = 0;
+        }
+
+        for (int i = 0; i < RoomManager.Rooms.Length; i++)
+        {
+            temperatureMovingAverage[i] = temperatureMovingAverage[i] * 0.9f + RoomManager.Rooms[i].Temperature * 0.1f;
         }
     }
 
@@ -71,29 +86,32 @@ public class HeatingAgent : Agent
 
     private void UpdateRewards()
     {
+        Room currentRoom = UserMovement.GetCurrentRoom();
+        float totalReward = 0f;
+
         for (int i = 0; i < RoomManager.Rooms.Length; i++)
         {
             var room = RoomManager.Rooms[i];
-            float roomReward = CalculateRoomReward(room);
-            AddReward(roomReward);
+            totalReward += CalculateRoomReward(room, currentRoom, temperatureMovingAverage[i]);
         }
 
+        AddReward(totalReward);
         lastWellBeing = UserWellBeingManager.WellBeing;
     }
 
-    private float CalculateRoomReward(Room room)
+    private float CalculateRoomReward(Room room, Room currentRoom, float averageTemperature)
     {
         float reward = 0f;
         float wellBeingChange = UserWellBeingManager.WellBeing - lastWellBeing;
 
-        if (UserMovement.GetCurrentRoom() == room && UserWellBeingManager.WellBeing >= 9)
-        {
-            reward += 0.1f;
-        }
-
-        if (UserMovement.GetCurrentRoom() == room && Math.Abs(wellBeingChange) > 0 && UserWellBeingManager.WellBeing < 9)
+        if (currentRoom == room && wellBeingChange > 0)
         {
             reward += wellBeingChange;
+        }
+
+        if (Mathf.Abs(averageTemperature - 23f) > TemperatureRangeThreshold)
+        {
+            reward -= Mathf.Abs(averageTemperature - 23f) * 0.05f;
         }
 
         return reward;
