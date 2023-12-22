@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class TimeManager : MonoBehaviour
@@ -22,8 +23,7 @@ public class TimeManager : MonoBehaviour
 
     private void FixedUpdate()
     {
-        SimulatedTime += Time.deltaTime * TimeScale;
-        //Debug.Log(SimulatedTime);
+        SimulatedTime += Time.fixedDeltaTime * TimeScale;
         CheckDayChange();
     }
 

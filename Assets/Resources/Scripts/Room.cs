@@ -22,8 +22,7 @@ public class Room : MonoBehaviour
     {
         if (TimeManager.Instance != null)
         {
-            // Use Time.deltaTime multiplied by TimeScale for a smoother timeDelta
-            float timeDelta = Time.deltaTime * TimeManager.Instance.TimeScale;
+            float timeDelta = Time.fixedDeltaTime * TimeManager.Instance.TimeScale;
 
             // Update Temperature
             if (IsHeaterOn && Temperature < MaxTemperature)

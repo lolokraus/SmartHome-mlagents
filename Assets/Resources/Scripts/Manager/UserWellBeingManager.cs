@@ -8,11 +8,11 @@ public class UserWellBeingManager : MonoBehaviour
     private const float OptimalTemperature = 23f;
     private const float WellBeingChangeRate = 0.005f; // Rate of change per simulated second
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (TimeManager.Instance != null)
         {
-            float timeDelta = Time.deltaTime * TimeManager.Instance.TimeScale;
+            float timeDelta = Time.fixedDeltaTime * TimeManager.Instance.TimeScale;
             Room currentRoom = User.GetCurrentRoom();
             if (currentRoom != null)
             {
@@ -24,7 +24,7 @@ public class UserWellBeingManager : MonoBehaviour
     private void UpdateWellBeingBasedOnRoom(Room room, float timeDelta)
     {
         float temperatureDifference = Mathf.Abs(room.Temperature - OptimalTemperature);
-        if (Math.Abs(room.Temperature - OptimalTemperature) > 0.5f) // If not at optimal temperature
+        if (temperatureDifference > 1.0f) // If not at optimal temperature
         {
             float wellBeingChange = WellBeingChangeRate * temperatureDifference * timeDelta;
             WellBeing = Mathf.Max(0, WellBeing - wellBeingChange); // Decrease well-being

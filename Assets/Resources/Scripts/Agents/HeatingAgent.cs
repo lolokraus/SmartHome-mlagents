@@ -13,21 +13,21 @@ public class HeatingAgent : Agent
 
     private float lastWellBeing = 5f;
 
-    private int stepsSinceLastDecision = 0;
-    private const int decisionInterval = 50;
-
-    private int stepsSinceLastRewardCheck = 0;
-    private const int checkRewardInterval = 5;
-
     private const float TemperatureRangeThreshold = 2.0f;
     private float[] temperatureMovingAverage;
+
+    private float timeSinceLastDecision = 0f;
+    private float timeSinceLastRewardCheck = 0f;
+    private const float DecisionInterval = 10f;
+    private const float RewardCheckInterval = 5f;
 
     public override void OnEpisodeBegin()
     {
         Debug.Log("Start Simulation");
         foreach (var room in RoomManager.Rooms)
         {
-            room.Temperature = Random.Range(15f, 30f);
+            //room.Temperature = Random.Range(15f, 30f);
+            room.Temperature = 17;
             room.SetHeater(false);
             room.EnergyConsumption = 0f;
         }
@@ -35,33 +35,38 @@ public class HeatingAgent : Agent
         UserWellBeingManager.WellBeing = 5f;
         lastWellBeing = UserWellBeingManager.WellBeing;
 
-        temperatureMovingAverage = new float[RoomManager.Rooms.Length];
+        /*temperatureMovingAverage = new float[RoomManager.Rooms.Length];
         for (int i = 0; i < RoomManager.Rooms.Length; i++)
         {
             temperatureMovingAverage[i] = RoomManager.Rooms[i].Temperature;
-        }
+        }*/
     }
 
     private void FixedUpdate()
     {
-        stepsSinceLastDecision++;
-        if (stepsSinceLastDecision >= decisionInterval)
+        if (TimeManager.Instance != null)
         {
-            RequestDecision();
-            stepsSinceLastDecision = 0;
+            float timeDelta = Time.fixedDeltaTime * TimeManager.Instance.TimeScale;
+
+            timeSinceLastDecision += timeDelta;
+            if (timeSinceLastDecision >= DecisionInterval)
+            {
+                RequestDecision();
+                timeSinceLastDecision = 0f;
+            }
+
+            timeSinceLastRewardCheck += timeDelta;
+            if (timeSinceLastRewardCheck >= RewardCheckInterval)
+            {
+                UpdateRewards();
+                timeSinceLastRewardCheck = 0f;
+            }
         }
 
-        stepsSinceLastRewardCheck++;
-        if (stepsSinceLastRewardCheck >= checkRewardInterval)
-        {
-            UpdateRewards();
-            stepsSinceLastRewardCheck = 0;
-        }
-
-        for (int i = 0; i < RoomManager.Rooms.Length; i++)
+        /*for (int i = 0; i < RoomManager.Rooms.Length; i++)
         {
             temperatureMovingAverage[i] = temperatureMovingAverage[i] * 0.9f + RoomManager.Rooms[i].Temperature * 0.1f;
-        }
+        }*/
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -86,20 +91,24 @@ public class HeatingAgent : Agent
 
     private void UpdateRewards()
     {
-        Room currentRoom = UserMovement.GetCurrentRoom();
-        float totalReward = 0f;
+        
+        float wellBeingDeviation = UserWellBeingManager.WellBeing - 10;
+        AddReward(wellBeingDeviation);
 
-        for (int i = 0; i < RoomManager.Rooms.Length; i++)
-        {
-            var room = RoomManager.Rooms[i];
-            totalReward += CalculateRoomReward(room, currentRoom, temperatureMovingAverage[i]);
-        }
+        /* Room currentRoom = UserMovement.GetCurrentRoom();
+         float totalReward = 0f;
 
-        AddReward(totalReward);
-        lastWellBeing = UserWellBeingManager.WellBeing;
+         for (int i = 0; i < RoomManager.Rooms.Length; i++)
+         {
+             var room = RoomManager.Rooms[i];
+             totalReward += CalculateRoomReward(room, currentRoom, temperatureMovingAverage[i]);
+         }
+
+         AddReward(totalReward);
+         lastWellBeing = UserWellBeingManager.WellBeing;*/
     }
 
-    private float CalculateRoomReward(Room room, Room currentRoom, float averageTemperature)
+    /*private float CalculateRoomReward(Room room, Room currentRoom, float averageTemperature)
     {
         float reward = 0f;
         float wellBeingChange = UserWellBeingManager.WellBeing - lastWellBeing;
@@ -115,7 +124,7 @@ public class HeatingAgent : Agent
         }
 
         return reward;
-    }
+    }*/
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {

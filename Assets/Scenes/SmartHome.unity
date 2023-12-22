@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641275, b: 0.5748172, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641258, b: 0.5748172, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -886,7 +886,7 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 10000
+  MaxStep: 5000
   RoomManager: {fileID: 1530906672}
   UserWellBeingManager: {fileID: 944879233}
   UserMovement: {fileID: 747680569}
@@ -1531,7 +1531,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67afa7f6672b3e14e80d648f32c96a38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TimeScale: 30
+  TimeScale: 50
 --- !u!1 &1247468794
 GameObject:
   m_ObjectHideFlags: 0
