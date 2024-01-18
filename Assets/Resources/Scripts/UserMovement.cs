@@ -46,7 +46,7 @@ public class UserMovement : MonoBehaviour
         }
     }
 
-    private Vector3 DetermineCurrentRoom(int currentHour, int dayOfWeek) //TODO randomise schedule, create more rooms, make a more realistic schedule, stop using coordinates, switch everywhere to tags
+    private Vector3 DetermineCurrentRoom(int currentHour, int dayOfWeek)
     {
         // Weekday Schedule
         if (dayOfWeek < 5)

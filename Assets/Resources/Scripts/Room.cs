@@ -1,17 +1,13 @@
-using System;
 using UnityEngine;
-
 
 public class Room : MonoBehaviour
 {
-    private const float BaseTemperature = 15f;
-    private const float MaxTemperature = 30f;
-    private const float HeatingRate = 0.038f; // Temperature increase per simulated second //TODO I think it scales correctly (those two values are good but not perfect can be changes and played with)
-    private const float CoolingRate = 0.025f; // Temperature decrease per simulated second //TODO I think it scales correctly
+    private const float HeatingRate = 0.038f;
+    private const float CoolingRate = 0.025f;
 
     public float Temperature { get; set; }
     public bool IsHeaterOn { get; set; }
-    public float EnergyConsumption { get; set; } //TODO I think it scales correctly
+    public float EnergyConsumption { get; set; }
 
     private void Start()
     {
@@ -24,27 +20,41 @@ public class Room : MonoBehaviour
         {
             float timeDelta = Time.fixedDeltaTime * TimeManager.Instance.TimeScale;
 
-            // Update Temperature
-            if (IsHeaterOn && Temperature < MaxTemperature)
-                Temperature += HeatingRate * timeDelta;
-            else if (!IsHeaterOn && Temperature > BaseTemperature)
-                Temperature -= CoolingRate * timeDelta;
+            if (IsHeaterOn)
+                Temperature += CalculateDynamicHeatingRate(Temperature) * timeDelta;
+            else
+                Temperature -= CalculateDynamicCoolingRate(Temperature) * timeDelta;
 
-            // Update Energy Consumption
             if (IsHeaterOn)
                 EnergyConsumption += CalculateEnergyUsage(Temperature, timeDelta);
         }
     }
 
-    private float CalculateEnergyUsage(float temperature, float timeDelta) //TODO needs more realistic calculation
+    private float CalculateDynamicHeatingRate(float temperature)
+    {
+        if (temperature > 25f)
+            return HeatingRate / (1 + (temperature - 25f));
+        else
+            return HeatingRate;
+    }
+
+    private float CalculateDynamicCoolingRate(float temperature)
+    {
+        if (temperature < 5f)
+            return CoolingRate / (1 + (5f - temperature));
+        else
+            return CoolingRate;
+    }
+
+    private float CalculateEnergyUsage(float temperature, float timeDelta)
     {
         float energyRate;
         if (temperature > 24f)
-            energyRate = (temperature - 24f) * 0.02f + 0.01f; // Higher rate above 24
+            energyRate = (temperature - 24f) * 0.02f + 0.01f;
         else if (temperature < 21f)
-            energyRate = (21f - temperature) * 0.02f + 0.01f; // Higher rate below 21
+            energyRate = (21f - temperature) * 0.02f + 0.01f;
         else
-            energyRate = 0.01f; // Standard rate between 21 and 24
+            energyRate = 0.01f;
         return energyRate * timeDelta;
     }
 
