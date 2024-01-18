@@ -16,7 +16,7 @@ public class HeatingAgent : Agent
 
     public override void OnEpisodeBegin()
     {
-        Debug.Log("Start Simulation");
+        //Debug.Log("Start Simulation");
         foreach (var room in RoomManager.Rooms)
         {
             room.Temperature = 23;
@@ -24,7 +24,7 @@ public class HeatingAgent : Agent
             room.EnergyConsumption = 0f;
         }
 
-        UserWellBeingManager.WellBeing = 5f;
+        UserWellBeingManager.WellBeing = 10f;
     }
 
     private void FixedUpdate()
@@ -36,6 +36,7 @@ public class HeatingAgent : Agent
             timeSinceLastDecision += timeDelta;
             if (timeSinceLastDecision >= DecisionInterval)
             {
+                //Debug.Log("Decision");
                 RequestDecision();
                 timeSinceLastDecision = 0f;
             }
@@ -43,6 +44,7 @@ public class HeatingAgent : Agent
             timeSinceLastRewardCheck += timeDelta;
             if (timeSinceLastRewardCheck >= RewardCheckInterval)
             {
+                //Debug.Log("Reward");
                 UpdateRewards();
                 timeSinceLastRewardCheck = 0f;
             }
