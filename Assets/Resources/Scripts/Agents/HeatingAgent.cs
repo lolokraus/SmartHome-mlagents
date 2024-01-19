@@ -28,6 +28,17 @@ public class HeatingAgent : Agent
             room.EnergyConsumption = 0f;
         }
 
+        if (TimeManager.Instance != null)
+        {
+            TimeManager.Instance.SimulatedTime = 0;
+            TimeManager.Instance.DaysPassed = 0;
+        }
+
+        if (UserMovement.Instance != null)
+        {
+            UserMovement.Instance.ResetToStartingPosition();
+        }
+
         UserWellBeingManager.WellBeing = 10f;
         previousWellBeing = UserWellBeingManager.WellBeing;
     }

@@ -3,12 +3,27 @@ using UnityEngine;
 
 public class UserMovement : MonoBehaviour
 {
+    public static UserMovement Instance { get; private set; }
+
     private bool _isMoving;
     private Vector3 _lastRoom = Vector3.positiveInfinity;
     private Vector3 _targetPosition;
 
     public RoomManager RoomManager;
     public float Speed = 1.0f;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     private void Start()
     {
@@ -69,6 +84,14 @@ public class UserMovement : MonoBehaviour
         }
 
         return new Vector3(0, 0, -10); // Default to BedRoom
+    }
+
+    public void ResetToStartingPosition()
+    {
+        _lastRoom = Vector3.positiveInfinity;
+        _isMoving = false;
+        transform.position = new Vector3(0, 0, -10);
+        StartCoroutine(DailyRoutine());
     }
 
     private IEnumerator MoveToRoom(Vector3 roomPosition)
