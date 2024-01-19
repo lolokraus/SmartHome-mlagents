@@ -94,9 +94,19 @@ public class HeatingAgent : Agent
 
     private void UpdateRewards()
     {
+        Room currentUserRoom = UserWellBeingManager.User.GetCurrentRoom();
+
         float currentWellBeing = UserWellBeingManager.WellBeing;
 
         AddReward(currentWellBeing/10);
+
+        foreach (var room in RoomManager.Rooms)
+        {
+            if (room != currentUserRoom && !room.IsHeaterOn)
+            {
+                AddReward(1);
+            }
+        }
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
