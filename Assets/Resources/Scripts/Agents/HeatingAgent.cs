@@ -1,4 +1,3 @@
-using System;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
@@ -11,8 +10,13 @@ public class HeatingAgent : Agent
 
     private float timeSinceLastDecision = 0f;
     private float timeSinceLastRewardCheck = 0f;
+
+    private float previousWellBeing = 10f;
+
     private const float DecisionInterval = 10f;
     private const float RewardCheckInterval = 5f;
+
+    private const float WellBeingThreshold = 2f;
 
     public override void OnEpisodeBegin()
     {
@@ -25,8 +29,8 @@ public class HeatingAgent : Agent
         }
 
         UserWellBeingManager.WellBeing = 10f;
+        previousWellBeing = UserWellBeingManager.WellBeing;
     }
-
     private void FixedUpdate()
     {
         if (TimeManager.Instance != null)
@@ -36,7 +40,6 @@ public class HeatingAgent : Agent
             timeSinceLastDecision += timeDelta;
             if (timeSinceLastDecision >= DecisionInterval)
             {
-                //Debug.Log("Decision");
                 RequestDecision();
                 timeSinceLastDecision = 0f;
             }
@@ -44,9 +47,14 @@ public class HeatingAgent : Agent
             timeSinceLastRewardCheck += timeDelta;
             if (timeSinceLastRewardCheck >= RewardCheckInterval)
             {
-                //Debug.Log("Reward");
                 UpdateRewards();
                 timeSinceLastRewardCheck = 0f;
+
+                // Optional: Early termination if well-being is too low
+                if (UserWellBeingManager.WellBeing < WellBeingThreshold)
+                {
+                    EndEpisode();
+                }
             }
         }
     }
@@ -55,7 +63,8 @@ public class HeatingAgent : Agent
     {
         foreach (var room in RoomManager.Rooms)
         {
-            sensor.AddObservation(room.Temperature);
+            float normalizedTemp = (room.Temperature - 23f) / 10f;
+            sensor.AddObservation(normalizedTemp);
             sensor.AddObservation(room.IsHeaterOn ? 1 : 0);
         }
 
@@ -73,9 +82,12 @@ public class HeatingAgent : Agent
 
     private void UpdateRewards()
     {
-        
-        float wellBeingDeviation = UserWellBeingManager.WellBeing - 10;
-        AddReward(wellBeingDeviation);
+        // Calculate the change in well-being
+        float currentWellBeing = UserWellBeingManager.WellBeing;
+        float wellBeingChange = currentWellBeing - previousWellBeing;
+        previousWellBeing = currentWellBeing;
+
+        AddReward(wellBeingChange);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
