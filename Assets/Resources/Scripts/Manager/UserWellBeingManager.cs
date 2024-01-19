@@ -4,6 +4,7 @@ using UnityEngine;
 public class UserWellBeingManager : MonoBehaviour
 {
     public UserMovement User;
+    public Renderer AvatarRenderer;
     public float WellBeing { get; set; } = 5;
     private const float OptimalTemperature = 23f;
     private const float WellBeingChangeRate = 0.005f;
@@ -17,6 +18,7 @@ public class UserWellBeingManager : MonoBehaviour
             if (currentRoom != null)
             {
                 UpdateWellBeingBasedOnRoom(currentRoom, timeDelta);
+                UpdateAvatarColor();
             }
         }
     }
@@ -32,6 +34,16 @@ public class UserWellBeingManager : MonoBehaviour
         else // If at optimal temperature
         {
             WellBeing = Mathf.Min(10, WellBeing + WellBeingChangeRate * timeDelta); // Increase well-being
+        }
+    }
+
+    private void UpdateAvatarColor()
+    {
+        if (AvatarRenderer != null)
+        {
+            Color newColor = Color.Lerp(Color.red, Color.green, WellBeing / 10f);
+
+            AvatarRenderer.material.SetColor("_Color", newColor);
         }
     }
 }
