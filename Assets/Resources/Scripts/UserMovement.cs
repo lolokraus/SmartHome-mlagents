@@ -66,33 +66,21 @@ public class UserMovement : MonoBehaviour
         // Weekday Schedule
         if (dayOfWeek < 5)
         {
-            if (currentHour is >= 8 and < 9)
-                return new Vector3(-10, 0, -10); // Kitchen
-            if (currentHour is >= 9 and < 12)
-                return new Vector3(-10, 0, 0); // WorkRoom
-            if (currentHour is >= 12 and < 13)
-                return new Vector3(-10, 0, -10); // Kitchen
-            if (currentHour is >= 13 and < 18)
-                return new Vector3(-10, 0, 0); // WorkRoom
-            if (currentHour is >= 18 and < 19)
-                return new Vector3(-10, 0, -10); // Kitchen
-            if (currentHour >= 19)
-                return new Vector3(0, 0, 0); // LivingRoom
+            if (currentHour is >= 8 and < 9) return new Vector3(-10, 0, -10); // Kitchen
+            if (currentHour is >= 9 and < 12) return new Vector3(-10, 0, 0); // WorkRoom
+            if (currentHour is >= 12 and < 13) return new Vector3(-10, 0, -10); // Kitchen
+            if (currentHour is >= 13 and < 18) return new Vector3(-10, 0, 0); // WorkRoom
+            if (currentHour is >= 18 and < 19) return new Vector3(-10, 0, -10); // Kitchen
+            if (currentHour >= 19) return new Vector3(0, 0, 0); // LivingRoom
         }
         else // Weekend Schedule
         {
-            if (currentHour is >= 9 and < 10)
-                return new Vector3(-10, 0, -10); // Kitchen
-            if (currentHour is >= 10 and < 13)
-                return new Vector3(0, 0, 0); // LivingRoom
-            if (currentHour is >= 13 and < 14)
-                return new Vector3(-10, 0, -10); // Kitchen
-            if (currentHour is >= 14 and < 19)
-                return new Vector3(0, 0, 0); // LivingRoom
-            if (currentHour is >= 19 and < 20)
-                return new Vector3(-10, 0, -10); // Kitchen
-            if (currentHour >= 20)
-                return new Vector3(0, 0, 0); // LivingRoom
+            if (currentHour is >= 9 and < 10) return new Vector3(-10, 0, -10); // Kitchen
+            if (currentHour is >= 10 and < 13) return new Vector3(0, 0, 0); // LivingRoom
+            if (currentHour is >= 13 and < 14) return new Vector3(-10, 0, -10); // Kitchen
+            if (currentHour is >= 14 and < 19) return new Vector3(0, 0, 0); // LivingRoom
+            if (currentHour is >= 19 and < 20) return new Vector3(-10, 0, -10); // Kitchen
+            if (currentHour >= 20) return new Vector3(0, 0, 0); // LivingRoom
         }
 
         return new Vector3(0, 0, -10); // Default to BedRoom
@@ -102,7 +90,7 @@ public class UserMovement : MonoBehaviour
     {
         _lastRoom = Vector3.positiveInfinity;
         _isMoving = false;
-        transform.position = new Vector3(0, 0, 0);
+        transform.position = new Vector3(0, 0, -10);
         StartCoroutine(DailyRoutine());
     }
 
@@ -127,8 +115,7 @@ public class UserMovement : MonoBehaviour
 
     public Room GetCurrentRoom()
     {
-        if (RoomManager == null)
-            return null;
+        if (RoomManager == null) return null;
 
         var smallestDistance = float.MaxValue;
         Room currentRoom = null;
