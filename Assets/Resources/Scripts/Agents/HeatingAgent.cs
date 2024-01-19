@@ -100,10 +100,12 @@ public class HeatingAgent : Agent
         float wellBeingChange = currentWellBeing - previousWellBeing;
         previousWellBeing = currentWellBeing;
 
-        AddReward(wellBeingChange);
+        // Increase the weight of well-being in the reward
+        AddReward(wellBeingChange * 5); // Adjust this multiplier as needed
 
+        // Apply a milder penalty for energy consumption
         float totalEnergyConsumption = RoomManager.TotalEnergyConsumption;
-        float energyPenalty = -totalEnergyConsumption / 200f;
+        float energyPenalty = -totalEnergyConsumption / 500f; // Adjust this divisor as needed
         AddReward(energyPenalty);
     }
 
