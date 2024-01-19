@@ -1,0 +1,29 @@
+{
+    "HeatingAgent": {
+        "checkpoints": [
+            {
+                "steps": 204965,
+                "file_path": "results\\HeatingRun20\\HeatingAgent\\HeatingAgent-204965.onnx",
+                "reward": null,
+                "creation_time": 1705662580.2903717,
+                "auxillary_file_paths": [
+                    "results\\HeatingRun20\\HeatingAgent\\HeatingAgent-204965.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 204965,
+            "file_path": "results\\HeatingRun20\\HeatingAgent.onnx",
+            "reward": null,
+            "creation_time": 1705662580.2903717,
+            "auxillary_file_paths": [
+                "results\\HeatingRun20\\HeatingAgent\\HeatingAgent-204965.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0.dev0",
+        "torch_version": "1.13.1+cu117"
+    }
+}
