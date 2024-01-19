@@ -1,3 +1,4 @@
+using System;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
@@ -14,7 +15,6 @@ public class HeatingAgent : Agent
     private const float DecisionInterval = 10f;
     private const float RewardCheckInterval = 5f;
 
-    private float previousWellBeing = 10f;
     private const float WellBeingThreshold = 2f;
 
     public override void OnEpisodeBegin()
@@ -38,8 +38,8 @@ public class HeatingAgent : Agent
             UserMovement.Instance.ResetToStartingPosition();
         }
 
-        previousWellBeing = UserWellBeingManager.WellBeing;
         UserWellBeingManager.WellBeing = 10f;
+
     }
     private void FixedUpdate()
     {
@@ -93,12 +93,19 @@ public class HeatingAgent : Agent
 
     private void UpdateRewards()
     {
-        // Calculate the change in well-being
         float currentWellBeing = UserWellBeingManager.WellBeing;
-        float wellBeingChange = currentWellBeing - previousWellBeing;
-        previousWellBeing = currentWellBeing;
 
-        AddReward(wellBeingChange);
+        // Provide a positive reward for maintaining optimal well-being
+        if (Math.Abs(currentWellBeing - 10f) < 0.1)
+        {
+            AddReward(0.1f);
+        }
+        else
+        {
+            // Penalize for deviation from optimal well-being
+            float wellBeingDeviation = Mathf.Abs(10f - currentWellBeing);
+            AddReward(-wellBeingDeviation / 100f); // Less severe penalty
+        }
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
