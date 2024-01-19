@@ -72,11 +72,14 @@ public class HeatingAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
+        Room currentUserRoom = UserWellBeingManager.User.GetCurrentRoom();
+
         foreach (var room in RoomManager.Rooms)
         {
             float normalizedTemp = (room.Temperature - 23f) / 10f;
             sensor.AddObservation(normalizedTemp);
             sensor.AddObservation(room.IsHeaterOn ? 1 : 0);
+            sensor.AddObservation(room == currentUserRoom ? 1f : 0f);
         }
 
         sensor.AddObservation(UserWellBeingManager.WellBeing / 10f);
@@ -93,12 +96,15 @@ public class HeatingAgent : Agent
 
     private void UpdateRewards()
     {
-        // Calculate the change in well-being
         float currentWellBeing = UserWellBeingManager.WellBeing;
         float wellBeingChange = currentWellBeing - previousWellBeing;
         previousWellBeing = currentWellBeing;
 
         AddReward(wellBeingChange);
+
+        float totalEnergyConsumption = RoomManager.TotalEnergyConsumption;
+        float energyPenalty = -totalEnergyConsumption / 200f;
+        AddReward(energyPenalty);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
