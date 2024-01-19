@@ -14,7 +14,6 @@ public class HeatingAgent : Agent
     private const float DecisionInterval = 10f;
     private const float RewardCheckInterval = 5f;
 
-    private float previousWellBeing = 10f;
     private const float WellBeingThreshold = 2f;
 
     public override void OnEpisodeBegin()
@@ -38,7 +37,6 @@ public class HeatingAgent : Agent
             UserMovement.Instance.ResetToStartingPosition();
         }
 
-        previousWellBeing = UserWellBeingManager.WellBeing;
         UserWellBeingManager.WellBeing = 10f;
     }
     private void FixedUpdate()
@@ -97,16 +95,8 @@ public class HeatingAgent : Agent
     private void UpdateRewards()
     {
         float currentWellBeing = UserWellBeingManager.WellBeing;
-        float wellBeingChange = currentWellBeing - previousWellBeing;
-        previousWellBeing = currentWellBeing;
 
-        // Increase the weight of well-being in the reward
-        AddReward(wellBeingChange * 5); // Adjust this multiplier as needed
-
-        // Apply a milder penalty for energy consumption
-        float totalEnergyConsumption = RoomManager.TotalEnergyConsumption;
-        float energyPenalty = -totalEnergyConsumption / 500f; // Adjust this divisor as needed
-        AddReward(energyPenalty);
+        AddReward(currentWellBeing/10);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
