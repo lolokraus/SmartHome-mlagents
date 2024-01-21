@@ -26,7 +26,7 @@ public class UserWellBeingManager : MonoBehaviour
     private void UpdateWellBeingBasedOnRoom(Room room, float timeDelta)
     {
         float temperatureDifference = Mathf.Abs(room.Temperature - OptimalTemperature);
-        if (temperatureDifference > 1.0f) // If not at optimal temperature
+        if (temperatureDifference > 0.5f) // If not at optimal temperature
         {
             float wellBeingChange = WellBeingChangeRate * temperatureDifference * timeDelta;
             WellBeing = Mathf.Max(0, WellBeing - wellBeingChange); // Decrease well-being

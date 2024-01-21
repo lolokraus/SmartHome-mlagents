@@ -48,24 +48,19 @@ public class Room : MonoBehaviour
 
     private float CalculateEnergyUsage(float temperature, float timeDelta)
     {
-        // Base energy consumption rate per unit of time when the heater is on.
-        float baseEnergyRate = 0.01f;
-
-        // Additional energy consumption when heating is needed.
-        float heatingEnergyRate = 0.03f;
-
-        // Calculate the energy needed to maintain the current temperature.
-        float energyToMaintain = baseEnergyRate * timeDelta;
-
-        // Calculate the additional energy needed to heat the room.
-        float additionalHeatingEnergy = 0f;
-        if (temperature < 23f && IsHeaterOn)
+        float energyRate;
+        if (temperature < 16.0f)
         {
-            additionalHeatingEnergy = (23f - temperature) * heatingEnergyRate * timeDelta;
+            energyRate = 0.1f;
+        }
+        else
+        {
+            energyRate = 0.02f;
         }
 
-        // Total energy consumption is the sum of maintaining plus any additional heating.
-        return energyToMaintain + additionalHeatingEnergy;
+        float energyUsed = energyRate * timeDelta;
+
+        return energyUsed;
     }
 
     public void SetHeater(bool status)

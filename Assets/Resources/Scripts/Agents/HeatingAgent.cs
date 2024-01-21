@@ -11,7 +11,7 @@ public class HeatingAgent : Agent
     private float timeSinceLastDecision = 0f;
     private float timeSinceLastRewardCheck = 0f;
 
-    private const float DecisionInterval = 10f;
+    private const float DecisionInterval = 5f;
     private const float RewardCheckInterval = 5f;
 
     private const float WellBeingThreshold = 2f;
@@ -101,16 +101,21 @@ public class HeatingAgent : Agent
         float wellBeingReward = currentWellBeing / 10f;
         AddReward(wellBeingReward);
 
-        // Penalty for energy usage.
-        float totalEnergyConsumption = RoomManager.TotalEnergyConsumption;
-        float energyPenalty = -totalEnergyConsumption / 1000f; // Scale to balance against well-being reward.
+        float energyPenalty = 0f;
 
         foreach (var room in RoomManager.Rooms)
         {
-            // Apply a larger penalty for heating unoccupied rooms.
             if (room != currentUserRoom && room.IsHeaterOn)
             {
-                energyPenalty *= 2;
+                if (room.Temperature < 16)
+                {
+                    energyPenalty -= 0.5f;
+                }
+                else
+                {
+                    energyPenalty -= 0.2f;
+                }
+                
             }
         }
 
