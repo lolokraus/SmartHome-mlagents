@@ -96,17 +96,25 @@ public class HeatingAgent : Agent
     {
         Room currentUserRoom = UserWellBeingManager.User.GetCurrentRoom();
 
+        // Reward for maintaining optimal well-being.
         float currentWellBeing = UserWellBeingManager.WellBeing;
+        float wellBeingReward = currentWellBeing / 10f;
+        AddReward(wellBeingReward);
 
-        AddReward(currentWellBeing/10);
+        // Penalty for energy usage.
+        float totalEnergyConsumption = RoomManager.TotalEnergyConsumption;
+        float energyPenalty = -totalEnergyConsumption / 1000f; // Scale to balance against well-being reward.
 
         foreach (var room in RoomManager.Rooms)
         {
-            if (room != currentUserRoom && !room.IsHeaterOn)
+            // Apply a larger penalty for heating unoccupied rooms.
+            if (room != currentUserRoom && room.IsHeaterOn)
             {
-                AddReward(1);
+                energyPenalty *= 2;
             }
         }
+
+        AddReward(energyPenalty);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
