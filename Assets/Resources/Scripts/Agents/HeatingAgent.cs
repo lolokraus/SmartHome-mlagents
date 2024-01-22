@@ -14,7 +14,7 @@ public class HeatingAgent : Agent
     private float lastEnergyConsumption = 0f;
 
     private const float DecisionInterval = 5f;
-    private const float RewardCheckInterval = 5f;
+    private const float RewardCheckInterval = 10f;
 
     private const float WellBeingThreshold = 2f;
     private const float EnergyThreshold = 200f;
@@ -115,7 +115,11 @@ public class HeatingAgent : Agent
         AddReward(wellBeingReward);
 
         float energyPenalty = 0f;
-        energyPenalty -= (RoomManager.Rooms[0].EnergyConsumption - lastEnergyConsumption) * 2;
+        energyPenalty -= (RoomManager.TotalEnergyConsumption - lastEnergyConsumption) * 2;
+        //Debug.Log("Total" + RoomManager.TotalEnergyConsumption);
+        //Debug.Log("Last" + lastEnergyConsumption);
+        //Debug.Log("energyPenalty" + energyPenalty);
+        
         AddReward(energyPenalty);
     }
 
