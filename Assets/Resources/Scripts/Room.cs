@@ -4,6 +4,7 @@ public class Room : MonoBehaviour
 {
     private const float HeatingRate = 0.038f;
     private const float CoolingRate = 0.025f;
+    private const float OutsideTemperature = 10f;
 
     public float Temperature { get; set; }
     public bool IsHeaterOn { get; set; }
@@ -32,18 +33,20 @@ public class Room : MonoBehaviour
 
     private float CalculateDynamicHeatingRate(float temperature)
     {
-        if (temperature > 25f)
-            return HeatingRate / (1 + (temperature - 25f));
-        else
-            return HeatingRate;
+        // Heating is more efficient when the room's temperature is closer to the outside temperature
+        float temperatureDifference = Mathf.Abs(temperature - OutsideTemperature);
+        return HeatingRate * Mathf.Max(0.1f, 1 - temperatureDifference / 60); // Linear decrease in heating rate
     }
 
     private float CalculateDynamicCoolingRate(float temperature)
     {
-        if (temperature < 5f)
-            return CoolingRate / (1 + (5f - temperature));
-        else
-            return CoolingRate;
+        // No cooling below outside temperature
+        if (temperature <= OutsideTemperature)
+            return 0; 
+
+        // Cooling rate decreases as the temperature approaches the outside temperature
+        float temperatureDifference = temperature - OutsideTemperature;
+        return CoolingRate * Mathf.Min(1, temperatureDifference / 60); // Larger divisor for more gradual cooling
     }
 
     private float CalculateEnergyUsage(float temperature, float timeDelta)

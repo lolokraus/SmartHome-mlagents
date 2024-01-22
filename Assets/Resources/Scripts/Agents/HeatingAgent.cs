@@ -11,14 +11,17 @@ public class HeatingAgent : Agent
     private float timeSinceLastDecision = 0f;
     private float timeSinceLastRewardCheck = 0f;
 
+    private float lastEnergyConsumption = 0f;
+
     private const float DecisionInterval = 5f;
     private const float RewardCheckInterval = 5f;
 
     private const float WellBeingThreshold = 2f;
+    private const float EnergyThreshold = 200f;
 
     public override void OnEpisodeBegin()
     {
-        Debug.Log("Reset Simulation");
+        Debug.Log("Reset Simulation - Energy: " + RoomManager.TotalEnergyConsumption);
         foreach (var room in RoomManager.Rooms)
         {
             room.Temperature = 23;
@@ -38,6 +41,7 @@ public class HeatingAgent : Agent
         }
 
         UserWellBeingManager.WellBeing = 10f;
+        lastEnergyConsumption = 0f;
     }
     private void FixedUpdate()
     {
@@ -57,11 +61,19 @@ public class HeatingAgent : Agent
             {
                 UpdateRewards();
                 timeSinceLastRewardCheck = 0f;
+                lastEnergyConsumption = RoomManager.TotalEnergyConsumption;
 
-                // Optional: Early termination if well-being is too low
+                // Early termination if well-being is too low
                 if (UserWellBeingManager.WellBeing < WellBeingThreshold)
                 {
-                    Debug.Log("Ended early");
+                    Debug.Log("Ended early well-being");
+                    EndEpisode();
+                }
+
+                // Early termination if energy is too high
+                if (RoomManager.TotalEnergyConsumption > EnergyThreshold)
+                {
+                    Debug.Log("Ended early energy");
                     EndEpisode();
                 }
             }
@@ -77,10 +89,11 @@ public class HeatingAgent : Agent
             float normalizedTemp = (room.Temperature - 23f) / 10f;
             sensor.AddObservation(normalizedTemp);
             sensor.AddObservation(room.IsHeaterOn ? 1 : 0);
-            sensor.AddObservation(room == currentUserRoom ? 1f : 0f);
+            sensor.AddObservation(room == currentUserRoom ? 1 : 0);
         }
 
         sensor.AddObservation(UserWellBeingManager.WellBeing / 10f);
+        sensor.AddObservation(RoomManager.TotalEnergyConsumption / 200f);
     }
 
     public override void OnActionReceived(ActionBuffers actions)
@@ -102,23 +115,7 @@ public class HeatingAgent : Agent
         AddReward(wellBeingReward);
 
         float energyPenalty = 0f;
-
-        foreach (var room in RoomManager.Rooms)
-        {
-            if (room != currentUserRoom && room.IsHeaterOn)
-            {
-                if (room.Temperature < 16)
-                {
-                    energyPenalty -= 0.5f;
-                }
-                else
-                {
-                    energyPenalty -= 0.2f;
-                }
-                
-            }
-        }
-
+        energyPenalty -= (RoomManager.Rooms[0].EnergyConsumption - lastEnergyConsumption) * 2;
         AddReward(energyPenalty);
     }
 
