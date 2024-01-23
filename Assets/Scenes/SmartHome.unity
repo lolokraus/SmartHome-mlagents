@@ -3878,7 +3878,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: c20c772942fc4014ea7b1b0f0d442f38, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: 67c1c806a7fdc0d43930a51cc9757bb0, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: HeatingAgent

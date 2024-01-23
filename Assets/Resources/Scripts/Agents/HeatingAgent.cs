@@ -13,15 +13,15 @@ public class HeatingAgent : Agent
 
     private float lastEnergyConsumption = 0f;
 
-    private const float DecisionInterval = 5f;
+    private const float DecisionInterval = 10f;
     private const float RewardCheckInterval = 10f;
 
     private const float WellBeingThreshold = 2f;
-    private const float EnergyThreshold = 200f;
+    private const float EnergyThreshold = 100f;
 
     public override void OnEpisodeBegin()
     {
-        Debug.Log("Reset Simulation - Energy: " + RoomManager.TotalEnergyConsumption);
+        Debug.Log("Reset Simulation");
         foreach (var room in RoomManager.Rooms)
         {
             room.Temperature = 23;
@@ -109,18 +109,29 @@ public class HeatingAgent : Agent
     {
         Room currentUserRoom = UserWellBeingManager.User.GetCurrentRoom();
 
-        // Reward for maintaining optimal well-being.
         float currentWellBeing = UserWellBeingManager.WellBeing;
         float wellBeingReward = currentWellBeing / 10f;
         AddReward(wellBeingReward);
 
+        float durationReward = 0.05f;
+        AddReward(durationReward);
+
         float energyPenalty = 0f;
-        energyPenalty -= (RoomManager.TotalEnergyConsumption - lastEnergyConsumption) * 2;
+        energyPenalty -= (RoomManager.TotalEnergyConsumption - lastEnergyConsumption) * 1.8f;
+
+        foreach (var room in RoomManager.Rooms)
+        {
+            if (room != currentUserRoom && room.IsHeaterOn)
+            {
+                energyPenalty -= 0.3f;
+            }
+            
+        }
+        AddReward(energyPenalty);
+
         //Debug.Log("Total" + RoomManager.TotalEnergyConsumption);
         //Debug.Log("Last" + lastEnergyConsumption);
         //Debug.Log("energyPenalty" + energyPenalty);
-        
-        AddReward(energyPenalty);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
