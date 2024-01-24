@@ -17,7 +17,7 @@ public class HeatingAgent : Agent
     private const float RewardCheckInterval = 10f;
 
     private const float WellBeingThreshold = 2f;
-    private const float EnergyThreshold = 100f;
+    private const float EnergyThreshold = 200f;
 
     public override void OnEpisodeBegin()
     {
@@ -108,7 +108,6 @@ public class HeatingAgent : Agent
     private void UpdateRewards()
     {
         Room currentUserRoom = UserWellBeingManager.User.GetCurrentRoom();
-
         float currentWellBeing = UserWellBeingManager.WellBeing;
         float wellBeingReward = currentWellBeing / 10f;
         AddReward(wellBeingReward);
@@ -125,14 +124,14 @@ public class HeatingAgent : Agent
             {
                 energyPenalty -= 0.3f;
             }
-            
         }
         AddReward(energyPenalty);
-
-        //Debug.Log("Total" + RoomManager.TotalEnergyConsumption);
-        //Debug.Log("Last" + lastEnergyConsumption);
-        //Debug.Log("energyPenalty" + energyPenalty);
     }
+
+    //Debug.Log("Total" + RoomManager.TotalEnergyConsumption);
+    //Debug.Log("Last" + lastEnergyConsumption);
+    //Debug.Log("energyPenalty" + energyPenalty);
+
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
