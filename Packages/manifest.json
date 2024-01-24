@@ -2,7 +2,7 @@
   "dependencies": {
     "com.unity.collab-proxy": "2.2.0",
     "com.unity.feature.development": "1.0.1",
-    "com.unity.ml-agents.extensions": "file:C:/Users/lorenz/Desktop/IUI/ml-agents/com.unity.ml-agents.extensions",
+    "com.unity.ml-agents.extensions": "file:C:/Users/lkraus/Desktop/Uni/IUI/ml-agents/com.unity.ml-agents.extensions",
     "com.unity.nuget.newtonsoft-json": "3.2.1",
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.timeline": "1.7.4",

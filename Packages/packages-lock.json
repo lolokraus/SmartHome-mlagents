@@ -89,7 +89,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ml-agents.extensions": {
-      "version": "file:C:/Users/lorenz/Desktop/IUI/ml-agents/com.unity.ml-agents.extensions",
+      "version": "file:C:/Users/lkraus/Desktop/Uni/IUI/ml-agents/com.unity.ml-agents.extensions",
       "depth": 0,
       "source": "local",
       "dependencies": {

@@ -3845,7 +3845,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 617214672}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 82c044bc99c50e54daa33ff805a88d79, type: 3}
   m_Name: 
@@ -3878,7 +3878,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: 67c1c806a7fdc0d43930a51cc9757bb0, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: fd3ffb2fe4c9aed44bd98902af8fcb23, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: HeatingAgent
@@ -8128,7 +8128,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67afa7f6672b3e14e80d648f32c96a38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TimeScale: 100
+  TimeScale: 10
 --- !u!1 &1209937640
 GameObject:
   m_ObjectHideFlags: 0
